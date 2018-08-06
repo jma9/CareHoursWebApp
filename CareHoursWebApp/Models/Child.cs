@@ -9,11 +9,11 @@ namespace CareHoursWebApp.Models
     [DataContract]
     public class Child
     {
-        [DataMember(Name = "id")]
+        [DataMember(Name = "ChildId")]
         public int ChildId { get; set; }
-        [DataMember(Name = "firstName")]
+        [DataMember(Name = "FirstName")]
         public string FirstName { get; set; }
-        [DataMember(Name = "lastName")]
+        [DataMember(Name = "LastName")]
         public string LastName { get; set; }
     }
 }

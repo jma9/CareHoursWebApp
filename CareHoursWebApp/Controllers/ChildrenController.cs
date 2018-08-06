@@ -34,8 +34,8 @@ namespace CareHoursWebApp.Controllers
         {
             var json = Get("https://jma.azure-api.net/api/child");
 
-            var ser = new DataContractJsonSerializer(typeof(List<List<Child>>));
-            var children = (ser.ReadObject(new MemoryStream(Encoding.UTF8.GetBytes(json))) as List<List<Child>>).First();
+            var ser = new DataContractJsonSerializer(typeof(List<Child>));
+            var children = ser.ReadObject(new MemoryStream(Encoding.UTF8.GetBytes(json))) as List<Child>;
 
             return children;
         }
