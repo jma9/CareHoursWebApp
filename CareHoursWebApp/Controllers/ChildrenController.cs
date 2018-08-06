@@ -23,16 +23,35 @@ namespace CareHoursWebApp.Controllers
         {
         }
 
-        private String Get(string uri)
+        private enum Op
+        {
+            GET,
+            POST,
+            PUT,
+            DELETE
+        }
+
+        private String HttpOp(string uri, Op op, string content = null)
         {
             var client = new HttpClient();
             client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", API_SUBSCRIPTION_KEY);
-            return client.GetAsync(uri).Result.Content.ReadAsStringAsync().Result;
+
+            switch (op)
+            {
+                case Op.GET:
+                    return client.GetAsync(uri).Result.Content.ReadAsStringAsync().Result;
+                case Op.DELETE:
+                    return client.DeleteAsync(uri).Result.Content.ReadAsStringAsync().Result;
+                case Op.POST:
+                    return client.PostAsync(uri, new StringContent(content, Encoding.UTF8, "application/json")).Result.Content.ReadAsStringAsync().Result;
+                default:
+                    return null;
+            }
         }
 
         private IEnumerable<Child> Children()
         {
-            var json = Get("https://jma.azure-api.net/api/child");
+            var json = HttpOp("https://jma.azure-api.net/api/child", Op.GET);
 
             var ser = new DataContractJsonSerializer(typeof(List<Child>));
             var children = ser.ReadObject(new MemoryStream(Encoding.UTF8.GetBytes(json))) as List<Child>;
@@ -42,7 +61,7 @@ namespace CareHoursWebApp.Controllers
 
         private Child Child(int childId)
         {
-            var json = Get("https://jma.azure-api.net/api/child/" + childId);
+            var json = HttpOp("https://jma.azure-api.net/api/child/" + childId, Op.GET);
             var ser = new DataContractJsonSerializer(typeof(Child));
             var child = ser.ReadObject(new MemoryStream(Encoding.UTF8.GetBytes(json))) as Child;
 
@@ -51,6 +70,12 @@ namespace CareHoursWebApp.Controllers
 
         private Child AddChild(Child child)
         {
+            var ser = new DataContractJsonSerializer(typeof(Child));
+            var ms = new MemoryStream();
+            ser.WriteObject(ms, child);
+            byte[] json = ms.ToArray();
+            var content = Encoding.UTF8.GetString(json, 0, json.Length);
+            var responseJson = HttpOp("https://jma.azure-api.net/api/child/", Op.POST, content);
             return child;
         }
 
@@ -60,6 +85,7 @@ namespace CareHoursWebApp.Controllers
 
         private void RemoveChild(Child child)
         {
+            var json = HttpOp("https://jma.azure-api.net/api/child/" + child.ChildId, Op.DELETE);
         }
 
         // GET: Children
