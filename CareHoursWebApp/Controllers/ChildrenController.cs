@@ -17,6 +17,8 @@ namespace CareHoursWebApp.Controllers
 {
     public class ChildrenController : Controller
     {
+        private const string API_SUBSCRIPTION_KEY = "{subscription key}";
+
         public ChildrenController()
         {
         }
@@ -24,8 +26,7 @@ namespace CareHoursWebApp.Controllers
         private String Get(string uri)
         {
             var client = new HttpClient();
-            //            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", "{subscription key}");
-            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", "e9149432203547528d11b5749f0f4278");
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", API_SUBSCRIPTION_KEY);
             return client.GetAsync(uri).Result.Content.ReadAsStringAsync().Result;
         }
 
