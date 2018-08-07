@@ -12,7 +12,7 @@ using System.Runtime.Serialization.Json;
 using System.IO;
 using System.Text;
 using System.Runtime.Serialization;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace CareHoursWebApp.Controllers
 {
@@ -20,14 +20,9 @@ namespace CareHoursWebApp.Controllers
     {
         private Api api;
 
-        public ChildrenController()
+        public ChildrenController(IOptions<Startup.AppSettings> appSettings)
         {
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json").Build();
-
-            var subscriptionKey = configuration["Api:SubscriptionKey"];
-            api = new Api(subscriptionKey);
+            api = new Api(appSettings.Value.SubscriptionKey);
         }
 
         private class Api

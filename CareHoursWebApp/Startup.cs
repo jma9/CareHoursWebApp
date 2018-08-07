@@ -18,9 +18,15 @@ namespace CareHoursWebApp
 
         public IConfiguration Configuration { get; }
 
+        public class AppSettings
+        {
+            public string SubscriptionKey { get; set; }
+        }
+
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<AppSettings>(options => Configuration.GetSection("AppSettings").Bind(options));
             services.AddMvc();
         }
 
