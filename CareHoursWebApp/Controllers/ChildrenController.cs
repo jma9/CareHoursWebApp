@@ -12,20 +12,26 @@ using System.Runtime.Serialization.Json;
 using System.IO;
 using System.Text;
 using System.Runtime.Serialization;
+using Microsoft.Extensions.Configuration;
 
 namespace CareHoursWebApp.Controllers
 {
     public class ChildrenController : Controller
     {
-        private Api api = new Api();
+        private Api api;
 
         public ChildrenController()
         {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json").Build();
+
+            var subscriptionKey = configuration["Api:SubscriptionKey"];
+            api = new Api(subscriptionKey);
         }
 
         private class Api
         {
-            private const string API_SUBSCRIPTION_KEY = "{subscription key}";
             private const string JSON_CONTENT_TYPE = "application/json";
             private const string CHILDREN_BASE_URI = "https://jma.azure-api.net/api/child/";
             private const string SUBSCRIPTION_KEY_HEADER = "Ocp-Apim-Subscription-Key";
@@ -53,9 +59,9 @@ namespace CareHoursWebApp.Controllers
                 return childListSerializer.ReadObject(new MemoryStream(Encoding.UTF8.GetBytes(jsonChild))) as List<Child>;
             }
 
-            public Api()
+            public Api(String apiSubscriptionKey)
             {
-                client.DefaultRequestHeaders.Add(SUBSCRIPTION_KEY_HEADER, API_SUBSCRIPTION_KEY);
+                client.DefaultRequestHeaders.Add(SUBSCRIPTION_KEY_HEADER, apiSubscriptionKey);
             }
 
             public IEnumerable<Child> GetList()
