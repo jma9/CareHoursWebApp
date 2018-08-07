@@ -49,7 +49,7 @@ namespace CareHoursWebApp
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Children}/{action=Index}");
             });
         }
     }
