@@ -17,81 +17,80 @@ namespace CareHoursWebApp.Controllers
 {
     public class ChildrenController : Controller
     {
-        private const string API_SUBSCRIPTION_KEY = "{subscription key}";
+        private Api api = new Api();
 
         public ChildrenController()
         {
         }
 
-        private enum Op
+        private class Api
         {
-            GET,
-            POST,
-            PUT,
-            DELETE
-        }
+            private const string API_SUBSCRIPTION_KEY = "{subscription key}";
+            private const string JSON_CONTENT_TYPE = "application/json";
+            private const string CHILDREN_BASE_URI = "https://jma.azure-api.net/api/child/";
+            private const string SUBSCRIPTION_KEY_HEADER = "Ocp-Apim-Subscription-Key";
 
-        private String HttpOp(string uri, Op op, string content = null)
-        {
-            var client = new HttpClient();
-            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", API_SUBSCRIPTION_KEY);
+            HttpClient client = new HttpClient();
 
-            switch (op)
+            private String JsonSerializeChild(Child child)
             {
-                case Op.GET:
-                    return client.GetAsync(uri).Result.Content.ReadAsStringAsync().Result;
-                case Op.DELETE:
-                    return client.DeleteAsync(uri).Result.Content.ReadAsStringAsync().Result;
-                case Op.POST:
-                    return client.PostAsync(uri, new StringContent(content, Encoding.UTF8, "application/json")).Result.Content.ReadAsStringAsync().Result;
-                default:
-                    return null;
+                var childSerializer = new DataContractJsonSerializer(typeof(Child));
+                var ms = new MemoryStream();
+                childSerializer.WriteObject(ms, child);
+                byte[] json = ms.ToArray();
+                return Encoding.UTF8.GetString(json, 0, json.Length);
             }
-        }
 
-        private IEnumerable<Child> Children()
-        {
-            var json = HttpOp("https://jma.azure-api.net/api/child", Op.GET);
+            private Child JsonDeserializeChild(String jsonChild)
+            {
+                var childSerializer = new DataContractJsonSerializer(typeof(Child));
+                return childSerializer.ReadObject(new MemoryStream(Encoding.UTF8.GetBytes(jsonChild))) as Child;
+            }
 
-            var ser = new DataContractJsonSerializer(typeof(List<Child>));
-            var children = ser.ReadObject(new MemoryStream(Encoding.UTF8.GetBytes(json))) as List<Child>;
+            private List<Child> JsonDeserializeChildList(String jsonChild)
+            {
+                var childListSerializer = new DataContractJsonSerializer(typeof(List<Child>));
+                return childListSerializer.ReadObject(new MemoryStream(Encoding.UTF8.GetBytes(jsonChild))) as List<Child>;
+            }
 
-            return children;
-        }
+            public Api()
+            {
+                client.DefaultRequestHeaders.Add(SUBSCRIPTION_KEY_HEADER, API_SUBSCRIPTION_KEY);
+            }
 
-        private Child Child(int childId)
-        {
-            var json = HttpOp("https://jma.azure-api.net/api/child/" + childId, Op.GET);
-            var ser = new DataContractJsonSerializer(typeof(Child));
-            var child = ser.ReadObject(new MemoryStream(Encoding.UTF8.GetBytes(json))) as Child;
+            public IEnumerable<Child> GetList()
+            {
+                return JsonDeserializeChildList(client.GetAsync(CHILDREN_BASE_URI).Result.Content.ReadAsStringAsync().Result);
+            }
 
-            return child;
-        }
+            public Child Get(int childId)
+            {
+                return JsonDeserializeChild(client.GetAsync(CHILDREN_BASE_URI + childId).Result.Content.ReadAsStringAsync().Result);
+            }
 
-        private Child AddChild(Child child)
-        {
-            var ser = new DataContractJsonSerializer(typeof(Child));
-            var ms = new MemoryStream();
-            ser.WriteObject(ms, child);
-            byte[] json = ms.ToArray();
-            var content = Encoding.UTF8.GetString(json, 0, json.Length);
-            var responseJson = HttpOp("https://jma.azure-api.net/api/child/", Op.POST, content);
-            return child;
-        }
+            public void Create(Child child)
+            {
+                var jsonResponse = client.PostAsync(CHILDREN_BASE_URI,
+                    new StringContent(JsonSerializeChild(child), Encoding.UTF8, JSON_CONTENT_TYPE)).Result.Content.ReadAsStringAsync().Result;
 
-        private void UpdateChild(Child child)
-        {
-        }
+            }
 
-        private void RemoveChild(Child child)
-        {
-            var json = HttpOp("https://jma.azure-api.net/api/child/" + child.ChildId, Op.DELETE);
+            public void Update(Child child)
+            {
+                var jsonResponse = client.PutAsync(CHILDREN_BASE_URI + child.ChildId,
+                    new StringContent(JsonSerializeChild(child), Encoding.UTF8, JSON_CONTENT_TYPE)).Result.Content.ReadAsStringAsync().Result;
+            }
+
+            public void Delete(Child child)
+            {
+                var jsonResponse = client.DeleteAsync(CHILDREN_BASE_URI + child.ChildId).Result.Content.ReadAsStringAsync().Result;
+            }
         }
 
         // GET: Children
         public IActionResult Index()
         {
-            return View(Children());
+            return View(api.GetList());
         }
 
         // GET: Children/Details/5
@@ -102,7 +101,7 @@ namespace CareHoursWebApp.Controllers
                 return NotFound();
             }
 
-            var child = Child(id.Value);
+            var child = api.Get(id.Value);
             if (child == null)
             {
                 return NotFound();
@@ -126,7 +125,7 @@ namespace CareHoursWebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                AddChild(child);
+                api.Create(child);
                 return RedirectToAction(nameof(Index));
             }
             return View(child);
@@ -140,7 +139,7 @@ namespace CareHoursWebApp.Controllers
                 return NotFound();
             }
 
-            var child = Child(id.Value);
+            var child = api.Get(id.Value);
             if (child == null)
             {
                 return NotFound();
@@ -162,7 +161,7 @@ namespace CareHoursWebApp.Controllers
 
             if (ModelState.IsValid)
             {
-                UpdateChild(child);
+                api.Update(child);
                 return RedirectToAction(nameof(Index));
             }
             return View(child);
@@ -176,7 +175,7 @@ namespace CareHoursWebApp.Controllers
                 return NotFound();
             }
 
-            var child = Child(id.Value);
+            var child = api.Get(id.Value);
             if (child == null)
             {
                 return NotFound();
@@ -190,8 +189,8 @@ namespace CareHoursWebApp.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            var child = Child(id);
-            RemoveChild(child);
+            var child = api.Get(id);
+            api.Delete(child);
             return RedirectToAction(nameof(Index));
         }
     }
