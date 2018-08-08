@@ -38,15 +38,34 @@ namespace CareHoursWebApp.Services
             return Encoding.UTF8.GetString(json, 0, json.Length);
         }
 
-        public IEnumerable<CareHours> GetCareHoursForChild(int childId)
+        public async Task<IEnumerable<CareHours>> GetCareHoursForChildAsync(int childId)
         {
-            return JsonDeserializeCarehoursList(client.GetAsync(String.Format(CAREHOURS_BASE_URI, childId)).Result.Content.ReadAsStringAsync().Result);
+            var response = await client.GetAsync(String.Format(CAREHOURS_BASE_URI, childId));
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            return JsonDeserializeCarehoursList(jsonResponse);
         }
 
-        public void Create(CareHours careHours)
+        public async Task<CareHours> CreateAsync(CareHours careHours)
         {
-            var jsonResponse = client.PostAsync(String.Format(CAREHOURS_BASE_URI, careHours.ChildId),
-                new StringContent(JsonSerializeCareHours(careHours), Encoding.UTF8, JSON_CONTENT_TYPE)).Result.Content.ReadAsStringAsync().Result;
+            var response = await client.PostAsync(String.Format(CAREHOURS_BASE_URI, careHours.ChildId),
+                new StringContent(JsonSerializeCareHours(careHours), Encoding.UTF8, JSON_CONTENT_TYPE));
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            return careHours;
+        }
+
+        public async Task<CareHours> GetAsync(int eventId)
+        {
+            return new CareHours()
+            {
+                ChildId = 2,
+                EndTime = "",
+                StartTime = "",
+                EventId = 3
+            };
+        }
+
+        public async Task DeleteAsync(CareHours careHours)
+        {
         }
     }
 }

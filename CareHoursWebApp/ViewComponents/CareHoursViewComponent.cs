@@ -16,10 +16,10 @@ namespace CareHoursWebApp.ViewComponents
             _careHoursService = careHoursService;
         }
 
-        public IViewComponentResult Invoke(int childId)
+        public async Task<IViewComponentResult> InvokeAsync(int childId)
         {
             ViewBag.ChildId = childId;
-            return View(_careHoursService.GetCareHoursForChild(childId));
+            return View(await _careHoursService.GetCareHoursForChildAsync(childId));
         }
     }
 }

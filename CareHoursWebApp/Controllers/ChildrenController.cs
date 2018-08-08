@@ -27,20 +27,20 @@ namespace CareHoursWebApp.Controllers
         }
 
         // GET: Children
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View(_childrenService.GetList());
+            return View(await _childrenService.GetListAsync());
         }
 
         // GET: Children/Details/5
-        public IActionResult Details(int? id)
+        public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var child = _childrenService.Get(id.Value);
+            var child = await _childrenService.GetAsync(id.Value);
             if (child == null)
             {
                 return NotFound();
@@ -60,25 +60,25 @@ namespace CareHoursWebApp.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create([Bind("ChildId,FirstName,LastName")] Child child)
+        public async Task<IActionResult> Create([Bind("ChildId,FirstName,LastName")] Child child)
         {
             if (ModelState.IsValid)
             {
-                _childrenService.Create(child);
+                await _childrenService.CreateAsync(child);
                 return RedirectToAction(nameof(Index));
             }
             return View(child);
         }
 
         // GET: Children/Edit/5
-        public IActionResult Edit(int? id)
+        public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var child = _childrenService.Get(id.Value);
+            var child = await _childrenService.GetAsync(id.Value);
             if (child == null)
             {
                 return NotFound();
@@ -91,7 +91,7 @@ namespace CareHoursWebApp.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(int id, [Bind("ChildId,FirstName,LastName")] Child child)
+        public async Task<IActionResult> Edit(int id, [Bind("ChildId,FirstName,LastName")] Child child)
         {
             if (id != child.ChildId)
             {
@@ -100,21 +100,21 @@ namespace CareHoursWebApp.Controllers
 
             if (ModelState.IsValid)
             {
-                _childrenService.Update(child);
+                await _childrenService.UpdateAsync(child);
                 return RedirectToAction(nameof(Index));
             }
             return View(child);
         }
 
         // GET: Children/Delete/5
-        public IActionResult Delete(int? id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var child = _childrenService.Get(id.Value);
+            var child = await _childrenService.GetAsync(id.Value);
             if (child == null)
             {
                 return NotFound();
@@ -126,10 +126,10 @@ namespace CareHoursWebApp.Controllers
         // POST: Children/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int childId)
         {
-            var child = _childrenService.Get(id);
-            _childrenService.Delete(child);
+            var child = await _childrenService.GetAsync(childId);
+            await _childrenService.DeleteAsync(child);
             return RedirectToAction(nameof(Index));
         }
     }

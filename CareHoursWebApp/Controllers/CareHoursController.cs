@@ -28,37 +28,41 @@ namespace CareHoursWebApp.Controllers
         // POST: CareHours/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind("ChildId,StartTime,EndTime")] CareHours careHours)
+        public async Task<IActionResult> Create([Bind("ChildId,StartTime,EndTime")] CareHours careHours)
         {
             if (ModelState.IsValid)
             {
-                _careHoursService.Create(careHours);
+                await _careHoursService.CreateAsync(careHours);
                 return RedirectToAction(nameof(ChildrenController.Details), "Children", new { id = careHours.ChildId });
             }
             return View();
         }
 
         // GET: CareHours/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var careHours = await _careHoursService.GetAsync(id.Value);
+            if (careHours == null)
+            {
+                return NotFound();
+            }
+
+            return View(careHours);
         }
 
         // POST: CareHours/Delete/5
-        [HttpPost]
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction(nameof(ChildrenController.Details), nameof(ChildrenController), new { childId = 1 });
-            }
-            catch
-            {
-                return View();
-            }
+            var careHours = await _careHoursService.GetAsync(id);
+            await _careHoursService.DeleteAsync(careHours);
+            return RedirectToAction(nameof(ChildrenController.Details), nameof(ChildrenController), new { careHours.ChildId });
         }
     }
 }

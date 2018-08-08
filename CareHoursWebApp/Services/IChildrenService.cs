@@ -1,18 +1,19 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using CareHoursWebApp.Models;
 
 namespace CareHoursWebApp.Services
 {
     public interface IChildrenService
     {
-        void Create(Child child);
+        Task<Child> CreateAsync(Child child);
 
-        void Delete(Child child);
+        Task DeleteAsync(Child child);
 
-        Child Get(int childId);
+        Task<Child> GetAsync(int childId);
 
-        IEnumerable<Child> GetList();
+        Task<IEnumerable<Child>> GetListAsync();
 
-        void Update(Child child);
+        Task<Child> UpdateAsync(Child child);
     }
 }

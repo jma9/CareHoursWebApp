@@ -45,31 +45,38 @@ namespace CareHoursWebApp.Services
             return childListSerializer.ReadObject(new MemoryStream(Encoding.UTF8.GetBytes(jsonChild))) as List<Child>;
         }
 
-        public IEnumerable<Child> GetList()
+        public async Task<IEnumerable<Child>> GetListAsync()
         {
-            return JsonDeserializeChildList(client.GetAsync(CHILDREN_BASE_URI).Result.Content.ReadAsStringAsync().Result);
+            var response = await client.GetAsync(CHILDREN_BASE_URI);
+            return JsonDeserializeChildList(await response.Content.ReadAsStringAsync());
         }
 
-        public Child Get(int childId)
+        public async Task<Child> GetAsync(int childId)
         {
-            return JsonDeserializeChild(client.GetAsync(CHILDREN_BASE_URI + childId).Result.Content.ReadAsStringAsync().Result);
+            var response = await client.GetAsync(CHILDREN_BASE_URI + childId);
+            return JsonDeserializeChild(await response.Content.ReadAsStringAsync());
         }
 
-        public void Create(Child child)
+        public async Task<Child> CreateAsync(Child child)
         {
-            var jsonResponse = client.PostAsync(CHILDREN_BASE_URI,
-                new StringContent(JsonSerializeChild(child), Encoding.UTF8, JSON_CONTENT_TYPE)).Result.Content.ReadAsStringAsync().Result;
+            var response = await client.PostAsync(CHILDREN_BASE_URI,
+                new StringContent(JsonSerializeChild(child), Encoding.UTF8, JSON_CONTENT_TYPE));
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            return child;
         }
 
-        public void Update(Child child)
+        public async Task<Child> UpdateAsync(Child child)
         {
-            var jsonResponse = client.PutAsync(CHILDREN_BASE_URI + child.ChildId,
-                new StringContent(JsonSerializeChild(child), Encoding.UTF8, JSON_CONTENT_TYPE)).Result.Content.ReadAsStringAsync().Result;
+            var response = await client.PutAsync(CHILDREN_BASE_URI + child.ChildId,
+                new StringContent(JsonSerializeChild(child), Encoding.UTF8, JSON_CONTENT_TYPE));
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            return child;
         }
 
-        public void Delete(Child child)
+        public async Task DeleteAsync(Child child)
         {
-            var jsonResponse = client.DeleteAsync(CHILDREN_BASE_URI + child.ChildId).Result.Content.ReadAsStringAsync().Result;
+            var response = await client.DeleteAsync(CHILDREN_BASE_URI + child.ChildId);
+            var jsonResponse = await response.Content.ReadAsStringAsync();
         }
     }
 }

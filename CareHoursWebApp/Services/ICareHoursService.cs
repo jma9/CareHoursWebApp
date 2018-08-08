@@ -1,12 +1,17 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using CareHoursWebApp.Models;
 
 namespace CareHoursWebApp.Services
 {
     public interface ICareHoursService
     {
-        IEnumerable<CareHours> GetCareHoursForChild(int childId);
+        Task<IEnumerable<CareHours>> GetCareHoursForChildAsync(int childId);
 
-        void Create(CareHours careHours);
+        Task<CareHours> CreateAsync(CareHours careHours);
+
+        Task<CareHours> GetAsync(int eventId);
+
+        Task DeleteAsync(CareHours careHours);
     }
 }
