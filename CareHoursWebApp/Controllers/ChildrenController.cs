@@ -13,85 +13,23 @@ using System.IO;
 using System.Text;
 using System.Runtime.Serialization;
 using Microsoft.Extensions.Options;
+using CareHoursWebApp.Services;
 
 namespace CareHoursWebApp.Controllers
 {
     public class ChildrenController : Controller
     {
-        private Api api;
+        private readonly IChildrenService _childrenService;
 
-        public ChildrenController(IOptions<Startup.AppSettings> appSettings)
+        public ChildrenController(IChildrenService childrenService)
         {
-            api = new Api(appSettings.Value.SubscriptionKey);
-        }
-
-        private class Api
-        {
-            private const string JSON_CONTENT_TYPE = "application/json";
-            private const string CHILDREN_BASE_URI = "https://jma.azure-api.net/api/child/";
-            private const string SUBSCRIPTION_KEY_HEADER = "Ocp-Apim-Subscription-Key";
-
-            HttpClient client = new HttpClient();
-
-            private String JsonSerializeChild(Child child)
-            {
-                var childSerializer = new DataContractJsonSerializer(typeof(Child));
-                var ms = new MemoryStream();
-                childSerializer.WriteObject(ms, child);
-                byte[] json = ms.ToArray();
-                return Encoding.UTF8.GetString(json, 0, json.Length);
-            }
-
-            private Child JsonDeserializeChild(String jsonChild)
-            {
-                var childSerializer = new DataContractJsonSerializer(typeof(Child));
-                return childSerializer.ReadObject(new MemoryStream(Encoding.UTF8.GetBytes(jsonChild))) as Child;
-            }
-
-            private List<Child> JsonDeserializeChildList(String jsonChild)
-            {
-                var childListSerializer = new DataContractJsonSerializer(typeof(List<Child>));
-                return childListSerializer.ReadObject(new MemoryStream(Encoding.UTF8.GetBytes(jsonChild))) as List<Child>;
-            }
-
-            public Api(String apiSubscriptionKey)
-            {
-                client.DefaultRequestHeaders.Add(SUBSCRIPTION_KEY_HEADER, apiSubscriptionKey);
-            }
-
-            public IEnumerable<Child> GetList()
-            {
-                return JsonDeserializeChildList(client.GetAsync(CHILDREN_BASE_URI).Result.Content.ReadAsStringAsync().Result);
-            }
-
-            public Child Get(int childId)
-            {
-                return JsonDeserializeChild(client.GetAsync(CHILDREN_BASE_URI + childId).Result.Content.ReadAsStringAsync().Result);
-            }
-
-            public void Create(Child child)
-            {
-                var jsonResponse = client.PostAsync(CHILDREN_BASE_URI,
-                    new StringContent(JsonSerializeChild(child), Encoding.UTF8, JSON_CONTENT_TYPE)).Result.Content.ReadAsStringAsync().Result;
-
-            }
-
-            public void Update(Child child)
-            {
-                var jsonResponse = client.PutAsync(CHILDREN_BASE_URI + child.ChildId,
-                    new StringContent(JsonSerializeChild(child), Encoding.UTF8, JSON_CONTENT_TYPE)).Result.Content.ReadAsStringAsync().Result;
-            }
-
-            public void Delete(Child child)
-            {
-                var jsonResponse = client.DeleteAsync(CHILDREN_BASE_URI + child.ChildId).Result.Content.ReadAsStringAsync().Result;
-            }
+            _childrenService = childrenService;
         }
 
         // GET: Children
         public IActionResult Index()
         {
-            return View(api.GetList());
+            return View(_childrenService.GetList());
         }
 
         // GET: Children/Details/5
@@ -102,7 +40,7 @@ namespace CareHoursWebApp.Controllers
                 return NotFound();
             }
 
-            var child = api.Get(id.Value);
+            var child = _childrenService.Get(id.Value);
             if (child == null)
             {
                 return NotFound();
@@ -126,7 +64,7 @@ namespace CareHoursWebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                api.Create(child);
+                _childrenService.Create(child);
                 return RedirectToAction(nameof(Index));
             }
             return View(child);
@@ -140,7 +78,7 @@ namespace CareHoursWebApp.Controllers
                 return NotFound();
             }
 
-            var child = api.Get(id.Value);
+            var child = _childrenService.Get(id.Value);
             if (child == null)
             {
                 return NotFound();
@@ -162,7 +100,7 @@ namespace CareHoursWebApp.Controllers
 
             if (ModelState.IsValid)
             {
-                api.Update(child);
+                _childrenService.Update(child);
                 return RedirectToAction(nameof(Index));
             }
             return View(child);
@@ -176,7 +114,7 @@ namespace CareHoursWebApp.Controllers
                 return NotFound();
             }
 
-            var child = api.Get(id.Value);
+            var child = _childrenService.Get(id.Value);
             if (child == null)
             {
                 return NotFound();
@@ -190,8 +128,8 @@ namespace CareHoursWebApp.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            var child = api.Get(id);
-            api.Delete(child);
+            var child = _childrenService.Get(id);
+            _childrenService.Delete(child);
             return RedirectToAction(nameof(Index));
         }
     }

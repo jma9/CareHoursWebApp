@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CareHoursWebApp.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -27,6 +28,8 @@ namespace CareHoursWebApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<AppSettings>(options => Configuration.GetSection("AppSettings").Bind(options));
+            services.AddScoped<ICareHoursService, CareHoursService>();
+            services.AddScoped<IChildrenService, ChildrenService>();
             services.AddMvc();
         }
 

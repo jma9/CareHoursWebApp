@@ -28,3 +28,5 @@
     <a asp-action="Edit" asp-route-id="@Model.ChildId">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>
+
+@await Component.InvokeAsync("CareHours", new { childId = Model.ChildId })
