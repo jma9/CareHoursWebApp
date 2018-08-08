@@ -30,6 +30,7 @@ namespace CareHoursWebApp
             services.Configure<AppSettings>(options => Configuration.GetSection("AppSettings").Bind(options));
             services.AddScoped<ICareHoursService, CareHoursService>();
             services.AddScoped<IChildrenService, ChildrenService>();
+            services.AddScoped<IFeedbackService, FeedbackService>();
             services.AddMvc();
         }
 
