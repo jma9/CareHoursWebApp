@@ -38,6 +38,8 @@
     </dl>
     
     <form asp-action="Delete">
+        <input type="hidden" asp-for="ChildId" />
+        <input type="hidden" asp-for="EventId" />
         <input type="submit" value="Delete" class="btn btn-default" /> |
         <a asp-controller="Child" asp-action="Details" asp-route-id="@Model.ChildId">Back to Child</a>
     </form>

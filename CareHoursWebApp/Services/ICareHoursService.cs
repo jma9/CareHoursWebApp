@@ -10,7 +10,7 @@ namespace CareHoursWebApp.Services
 
         Task<CareHours> CreateAsync(CareHours careHours);
 
-        Task<CareHours> GetAsync(int eventId);
+        Task<CareHours> GetAsync(int childId, int eventId);
 
         Task DeleteAsync(CareHours careHours);
     }

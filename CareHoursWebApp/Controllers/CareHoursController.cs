@@ -39,14 +39,14 @@ namespace CareHoursWebApp.Controllers
         }
 
         // GET: CareHours/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? id, int childId)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var careHours = await _careHoursService.GetAsync(id.Value);
+            var careHours = await _careHoursService.GetAsync(childId, id.Value);
             if (careHours == null)
             {
                 return NotFound();
@@ -58,11 +58,11 @@ namespace CareHoursWebApp.Controllers
         // POST: CareHours/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int eventId, int childId)
         {
-            var careHours = await _careHoursService.GetAsync(id);
+            var careHours = await _careHoursService.GetAsync(childId, eventId);
             await _careHoursService.DeleteAsync(careHours);
-            return RedirectToAction(nameof(ChildrenController.Details), nameof(ChildrenController), new { careHours.ChildId });
+            return RedirectToAction(nameof(ChildrenController.Details), "Children", new { id = careHours.ChildId });
         }
     }
 }

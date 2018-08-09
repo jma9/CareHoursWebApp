@@ -38,7 +38,7 @@
                     @Html.DisplayFor(modelItem => item.EndTime)
                 </td>
                 <td>
-                    <a asp-action="Delete" asp-controller="CareHours" asp-route-id="@item.EventId">Delete</a>
+                    <a asp-action="Delete" asp-controller="CareHours" asp-route-id="@item.EventId" asp-route-childId="@ViewBag.ChildId">Delete</a>
                 </td>
             </tr>
         }

@@ -13,6 +13,7 @@ namespace CareHoursWebApp.Services
         private const string BASE_URI = "https://jma.azure-api.net/api/";
         private const string CAREHOURS_GET_URI = BASE_URI + "child/{0}/Carehours";
         private const string CAREHOURS_CREATE_URI = BASE_URI + "child/{0}/Carehours";
+        private const string CAREHOURS_DELETE_URI = BASE_URI + "child/{0}/Carehours/{1}";
 
         private const string SUBSCRIPTION_KEY_HEADER = "Ocp-Apim-Subscription-Key";
         private const string SUBSCRIPTION_KEY_CONFIGURATION = "AppSettings:SubscriptionKey";
@@ -43,19 +44,17 @@ namespace CareHoursWebApp.Services
             return careHours;
         }
 
-        public async Task<CareHours> GetAsync(int eventId)
+        public async Task<CareHours> GetAsync(int childId, int eventId)
         {
-            return new CareHours()
-            {
-                ChildId = 2,
-                EndTime = "",
-                StartTime = "",
-                EventId = 3
-            };
+            var careHoursList = await GetCareHoursForChildAsync(childId);
+            return careHoursList.FirstOrDefault(c => c.EventId == eventId);
         }
 
         public async Task DeleteAsync(CareHours careHours)
         {
+            var uri = String.Format(CAREHOURS_DELETE_URI, careHours.ChildId, careHours.EventId);
+            var response = await client.DeleteAsync(uri);
+            var jsonResponse = await response.Content.ReadAsStringAsync();
         }
     }
 }
