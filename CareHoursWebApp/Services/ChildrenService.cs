@@ -61,7 +61,7 @@ namespace CareHoursWebApp.Services
         public async Task DeleteAsync(Child child)
         {
             var uri = String.Format(CHILD_DELETE_URI, child.ChildId);
-            var response = await client.DeleteAsync(uri + child.ChildId);
+            var response = await client.DeleteAsync(uri);
             var jsonResponse = await response.Content.ReadAsStringAsync();
         }
     }

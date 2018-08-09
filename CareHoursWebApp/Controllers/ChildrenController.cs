@@ -91,13 +91,8 @@ namespace CareHoursWebApp.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ChildId,FirstName,LastName")] Child child)
+        public async Task<IActionResult> Edit([Bind("ChildId,FirstName,LastName")] Child child)
         {
-            if (id != child.ChildId)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
                 await _childrenService.UpdateAsync(child);
