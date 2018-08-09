@@ -22,6 +22,8 @@ namespace CareHoursWebApp
         public class AppSettings
         {
             public string SubscriptionKey { get; set; }
+
+            public string ApiBaseUri { get; set; }
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
