@@ -27,7 +27,7 @@ namespace CareHoursWebApp.Services
 
         public async Task<FeedbackResponse> PostFeedback(Feedback feedback)
         {
-            var uri = new Uri(baseUri, "/api/feedback");
+            var uri = new Uri(baseUri, "api/feedback");
 
             var response = await client.PostAsync(uri, feedbackSerializer.JsonHttpStringContent(feedback));
             return feedbackResponseSerializer.Deserialize(await response.Content.ReadAsStringAsync());

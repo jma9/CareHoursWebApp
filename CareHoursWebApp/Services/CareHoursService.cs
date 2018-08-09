@@ -28,7 +28,7 @@ namespace CareHoursWebApp.Services
 
         public async Task<IEnumerable<CareHours>> GetCareHoursForChildAsync(int childId)
         {
-            var uri = new Uri(baseUri, $"/api/child/{childId}/Carehours");
+            var uri = new Uri(baseUri, $"api/child/{childId}/Carehours");
 
             var response = await client.GetAsync(uri);
             var jsonResponse = await response.Content.ReadAsStringAsync();
@@ -37,7 +37,7 @@ namespace CareHoursWebApp.Services
 
         public async Task<CareHours> CreateAsync(CareHours careHours)
         {
-            var uri = new Uri(baseUri, $"/api/child/{careHours.ChildId}/Carehours");
+            var uri = new Uri(baseUri, $"api/child/{careHours.ChildId}/Carehours");
 
             var response = await client.PostAsync(uri, careHoursSerializer.JsonHttpStringContent(careHours));
             var jsonResponse = await response.Content.ReadAsStringAsync();
@@ -52,7 +52,7 @@ namespace CareHoursWebApp.Services
 
         public async Task DeleteAsync(CareHours careHours)
         {
-            var uri = new Uri(baseUri, $"/api/child/{careHours.ChildId}/Carehours/{careHours.EventId}");
+            var uri = new Uri(baseUri, $"api/child/{careHours.ChildId}/Carehours/{careHours.EventId}");
 
             var response = await client.DeleteAsync(uri);
             var jsonResponse = await response.Content.ReadAsStringAsync();

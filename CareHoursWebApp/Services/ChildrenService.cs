@@ -28,7 +28,7 @@ namespace CareHoursWebApp.Services
 
         public async Task<IEnumerable<Child>> GetListAsync()
         {
-            var uri = new Uri(baseUri, "/api/child");
+            var uri = new Uri(baseUri, "api/child");
 
             var response = await client.GetAsync(uri);
             return childListSerializer.Deserialize(await response.Content.ReadAsStringAsync());
@@ -36,7 +36,7 @@ namespace CareHoursWebApp.Services
 
         public async Task<Child> GetAsync(int childId)
         {
-            var uri = new Uri(baseUri, $"/api/child/{childId}");
+            var uri = new Uri(baseUri, $"api/child/{childId}");
 
             var response = await client.GetAsync(uri);
             return childSerializer.Deserialize(await response.Content.ReadAsStringAsync());
@@ -44,7 +44,7 @@ namespace CareHoursWebApp.Services
 
         public async Task<Child> CreateAsync(Child child)
         {
-            var uri = new Uri(baseUri, "/api/child");
+            var uri = new Uri(baseUri, "api/child");
 
             var response = await client.PostAsync(uri, childSerializer.JsonHttpStringContent(child));
             var jsonResponse = await response.Content.ReadAsStringAsync();
@@ -53,7 +53,7 @@ namespace CareHoursWebApp.Services
 
         public async Task<Child> UpdateAsync(Child child)
         {
-            var uri = new Uri(baseUri, $"/api/child/{child.ChildId}");
+            var uri = new Uri(baseUri, $"api/child/{child.ChildId}");
 
             var response = await client.PutAsync(uri, childSerializer.JsonHttpStringContent(child));
             var jsonResponse = await response.Content.ReadAsStringAsync();
@@ -62,7 +62,7 @@ namespace CareHoursWebApp.Services
 
         public async Task DeleteAsync(Child child)
         {
-            var uri = new Uri(baseUri, $"/api/child/{child.ChildId}");
+            var uri = new Uri(baseUri, $"api/child/{child.ChildId}");
 
             var response = await client.DeleteAsync(uri);
             var jsonResponse = await response.Content.ReadAsStringAsync();
