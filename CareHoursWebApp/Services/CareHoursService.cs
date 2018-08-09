@@ -29,17 +29,15 @@ namespace CareHoursWebApp.Services
         {
             var uri = $"api/child/{childId}/Carehours";
 
-            var response = await client.GetAsync(uri);
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-            return careHoursListSerializer.Deserialize(jsonResponse);
+            var responseStreamTask = client.GetStreamAsync(uri);
+            return await careHoursListSerializer.DeserializeAsync(responseStreamTask);
         }
 
         public async Task<CareHours> CreateAsync(CareHours careHours)
         {
             var uri = $"api/child/{careHours.ChildId}/Carehours";
 
-            var response = await client.PostAsync(uri, careHoursSerializer.JsonHttpStringContent(careHours));
-            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var responseStreamTask = await client.PostAsync(uri, careHoursSerializer.JsonHttpStringContent(careHours)).ContinueWith(t => t.Result.Content.ReadAsStreamAsync());
             return careHours;
         }
 
@@ -53,8 +51,7 @@ namespace CareHoursWebApp.Services
         {
             var uri = $"api/child/{careHours.ChildId}/Carehours/{careHours.EventId}";
 
-            var response = await client.DeleteAsync(uri);
-            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var responseStreamTask = await client.DeleteAsync(uri).ContinueWith(t => t.Result.Content.ReadAsStreamAsync());
         }
     }
 }

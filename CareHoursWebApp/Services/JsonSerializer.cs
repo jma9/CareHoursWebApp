@@ -14,19 +14,19 @@ namespace CareHoursWebApp.Services
         private const string JSON_CONTENT_TYPE = "application/json";
         private readonly Encoding ENCODING = Encoding.UTF8;
 
-        public string Serialize(T t)
+        public String Serialize(T t)
         {
             var ser = new DataContractJsonSerializer(typeof(T));
             var ms = new MemoryStream();
             ser.WriteObject(ms, t);
             byte[] json = ms.ToArray();
-            return Encoding.UTF8.GetString(json, 0, json.Length);
+            return ENCODING.GetString(json, 0, json.Length);
         }
 
-        public T Deserialize(string s)
+        public async Task<T> DeserializeAsync(Task<Stream> s)
         {
             var ser = new DataContractJsonSerializer(typeof(T));
-            return ser.ReadObject(new MemoryStream(Encoding.UTF8.GetBytes(s))) as T;
+            return ser.ReadObject(await s) as T;
         }
 
         public StringContent JsonHttpStringContent(T t)

@@ -28,8 +28,8 @@ namespace CareHoursWebApp.Services
         {
             var uri = "api/feedback";
 
-            var response = await client.PostAsync(uri, feedbackSerializer.JsonHttpStringContent(feedback));
-            return feedbackResponseSerializer.Deserialize(await response.Content.ReadAsStringAsync());
+            var responseStreamTask = await client.PostAsync(uri, feedbackSerializer.JsonHttpStringContent(feedback)).ContinueWith(t => t.Result.Content.ReadAsStreamAsync());
+            return await feedbackResponseSerializer.DeserializeAsync(responseStreamTask);
         }
     }
 }

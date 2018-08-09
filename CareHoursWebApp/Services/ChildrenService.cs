@@ -29,24 +29,21 @@ namespace CareHoursWebApp.Services
         {
             var uri = "api/child";
 
-            var response = await client.GetAsync(uri);
-            return childListSerializer.Deserialize(await response.Content.ReadAsStringAsync());
+            return await childListSerializer.DeserializeAsync(client.GetStreamAsync(uri));
         }
 
         public async Task<Child> GetAsync(int childId)
         {
             var uri = $"api/child/{childId}";
 
-            var response = await client.GetAsync(uri);
-            return childSerializer.Deserialize(await response.Content.ReadAsStringAsync());
+            return await childSerializer.DeserializeAsync(client.GetStreamAsync(uri));
         }
 
         public async Task<Child> CreateAsync(Child child)
         {
             var uri = "api/child";
 
-            var response = await client.PostAsync(uri, childSerializer.JsonHttpStringContent(child));
-            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var responseStreamTask = await client.PostAsync(uri, childSerializer.JsonHttpStringContent(child)).ContinueWith(t => t.Result.Content.ReadAsStreamAsync());
             return child;
         }
 
@@ -54,8 +51,7 @@ namespace CareHoursWebApp.Services
         {
             var uri = $"api/child/{child.ChildId}";
 
-            var response = await client.PutAsync(uri, childSerializer.JsonHttpStringContent(child));
-            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var responseStreamTask = await client.PutAsync(uri, childSerializer.JsonHttpStringContent(child)).ContinueWith(t => t.Result.Content.ReadAsStreamAsync());
             return child;
         }
 
@@ -63,8 +59,7 @@ namespace CareHoursWebApp.Services
         {
             var uri = $"api/child/{child.ChildId}";
 
-            var response = await client.DeleteAsync(uri);
-            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var responseStreamTask = await client.DeleteAsync(uri).ContinueWith(t => t.Result.Content.ReadAsStreamAsync());
         }
     }
 }
