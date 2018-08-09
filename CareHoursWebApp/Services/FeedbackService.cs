@@ -13,7 +13,6 @@ namespace CareHoursWebApp.Services
         private const string SUBSCRIPTION_KEY_CONFIGURATION = "AppSettings:SubscriptionKey";
         private const string API_BASE_URI_CONFIGURATION= "AppSettings:ApiBaseUri";
 
-        private readonly Uri baseUri;
         private readonly HttpClient client = new HttpClient();
 
         private readonly JsonSerializer<Feedback> feedbackSerializer = new JsonSerializer<Feedback>();
@@ -22,12 +21,12 @@ namespace CareHoursWebApp.Services
         public FeedbackService(IConfiguration configuration)
         {
             client.DefaultRequestHeaders.Add(SUBSCRIPTION_KEY_HEADER, configuration[SUBSCRIPTION_KEY_CONFIGURATION]);
-            baseUri = new Uri(configuration[API_BASE_URI_CONFIGURATION]);
+            client.BaseAddress = new Uri(configuration[API_BASE_URI_CONFIGURATION]);
         }
 
         public async Task<FeedbackResponse> PostFeedback(Feedback feedback)
         {
-            var uri = new Uri(baseUri, "api/feedback");
+            var uri = "api/feedback";
 
             var response = await client.PostAsync(uri, feedbackSerializer.JsonHttpStringContent(feedback));
             return feedbackResponseSerializer.Deserialize(await response.Content.ReadAsStringAsync());
